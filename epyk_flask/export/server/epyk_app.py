@@ -1,89 +1,30 @@
-from flask import Flask
-import yaml, hashlib, sys, importlib, os
-
+from flask import Flask, Blueprint
+import yaml, hashlib, sys, os, importlib
+import epyk_engine
 app = Flask(__name__)
-config = None
 
 
-class MissingEpykFlaskConfigException(Exception):
-  """Exception to be raised when the configuration is missing"""
-  pass
 
-class MissingAttrConfig(Exception):
-  """Exception to be raised when an attribute is missing from the configuration"""
-  pass
+def init_flask_app(config_path):
+  for endpoint in epyk_engine.config['endpoints']['blueprints']:
+    mod = importlib.import_module(endpoint)
+    app.register_blueprint(getattr(mod, epyk_engine.config['endpoints']['blueprints'][endpoint]['attr_name']))
 
-def init(config_path):
-  global config
-  with open(config_path, 'r') as f:
-    config = yaml.load(f, Loader=yaml.FullLoader)
+def __init_test():
+  mod = importlib.import_module('epyk_basic_endpoints')
+  app.register_blueprint(getattr(mod, epyk_engine.config['endpoints']['blueprints']['epyk_basic_endpoints']['attr_name']))
 
-  for repo in config['repos']:
-    sys.path.append(repo['path'])
+def init_bp(name):
+  print('toto')
+  bp_config = epyk_engine.config['endpoints']['blueprints'][name]
+  basic_blueprint = Blueprint(bp_config['name'], bp_config['import_name'], **{k: v for k, v in bp_config.items() if k not in ['name', 'import_name', 'attr_name']})
+  return basic_blueprint
 
-def hash_content(file_path):
-  with open(file_path, 'rb') as f:
-    f_hash = hashlib.blake2b()
-    while True:
-      data = f.read(8192)
-      if not data:
-        break
+def engine_register(*args):
+  return init_bp(args[0])
 
-      f_hash.update(data)
-  return f_hash.hexdigest()
 
-def parse_config(attr, config):
-  """"""
-  attr_len = len(attr)
-  if attr_len != 0:
-    if attr[0] not in config:
-      raise MissingAttrConfig('Missing attribute %s from configuration' % attr)
-
-    if attr_len > 1:
-      parse_config(attr[1], config[attr[0]])
-
-def config_required(*dec_args):
-  """Allows to check specific properties have been set before using a function"""
-  global config
-  def wrap(func):
-    if config is None:
-      raise MissingEpykFlaskConfigException('Configuration required for endpoint: %s. Set epyk_config from %s' % (func.__name__, __name__))
-
-    for attr in dec_args:
-      parse_config(attr, config)
-
-    def inner(*args, **kwargs):
-      return func(*args, **kwargs)
-
-    return inner
-
-  return wrap
-
-def linked_script(folder_name='root', script_name='index'):
-  """"""
-  global config
-  def wrap(func):
-    script_hash = ''
-    used_repo = config['main_repo']['name']
-    file_path = os.path.join(config['main_repo']['path'], folder_name, script_name)
-    if os.path.exists(file_path):
-      script_hash = hash_content(file_path)
-    else:
-      for repo in config['repos']:
-        file_path = os.path.join(repo['path'], folder_name, script_name)
-        if os.path.exists(file_path):
-          script_hash = hash_content(file_path)
-          break
-
-    output_file = os.path.join(config['html_output'], '%s_%s_%s_%s.html' % (used_repo, folder_name, script_name, script_hash))
-    if os.path.exists(output_file):
-      with open(output_file, 'r') as f:
-        data = f.read()
-      return data
-
-    def inner(*args, **kwargs):
-      return func(*args, **kwargs)
-
-    return inner
-
-  return wrap
+if __name__ == '__main__':
+  epyk_engine.init()
+  __init_test()
+  app.run(host=epyk_engine.config['host']['ip'], port=epyk_engine.config['host']['port'], threaded=True)

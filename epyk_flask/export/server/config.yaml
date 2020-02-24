@@ -1,8 +1,27 @@
 repos:
-  - repo:     &main_repo
+
+  main_repo:
+    &main_repo
     name:     Main Repo
-    path:     UI/scripts
+    path:     D:\Experiments\epyk-flask2\epyk-flask\UI\scripts
 
 default_repo:  *main_repo
 
-html_output: UI/html
+html_output:   D:\Experiments\epyk-flask2\epyk-flask\UI
+
+host:
+  ip:           127.0.0.1
+  port:         5000
+
+server_interface:  epyk_app
+
+endpoints:
+  path:
+    -  D:\Experiments\epyk-flask2\epyk-flask\endpoints
+  blueprints:
+    epyk_basic_endpoints:
+      url_prefix:
+      name:        basics
+      import_name: epyk_basic_endpoints
+      attr_name: app
+
