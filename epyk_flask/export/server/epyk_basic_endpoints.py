@@ -1,13 +1,11 @@
 from epyk_flask import epyk_engine
-from flask import send_from_directory
-import traceback
+from flask import send_from_directory, Blueprint
 import os
-app = epyk_engine.register(__name__)
-flask_app = epyk_engine.engine_app.app
+basic = Blueprint('basic', __name__)
 
 @epyk_engine.config_required
-@app.route("/")
-@app.route("/index")
+@basic.route("/")
+@basic.route("/index")
 def index():
   try:
     result = epyk_engine.run_script('root', 'index')
@@ -19,8 +17,8 @@ def index():
     return 'FAIL', 500
 
 @epyk_engine.config_required
-@app.route("/run/<folder_name>", defaults={'script_name': 'index'}, methods=['GET'])
-@app.route("/run/<folder_name>/<script_name>", methods=['GET'])
+@basic.route("/run/<folder_name>", defaults={'script_name': 'index'}, methods=['GET'])
+@basic.route("/run/<folder_name>/<script_name>", methods=['GET'])
 def run_report(folder_name, script_name):
   try:
     result = epyk_engine.run_script(folder_name, script_name)

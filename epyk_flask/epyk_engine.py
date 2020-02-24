@@ -93,7 +93,6 @@ def find_script(folder_name, script_name):
 def run_script(folder_name, script_name):
   """
   """
-  print('tutu')
   if not script_name.endswith('.py'):
     full_name = '%s.py' % script_name
   else:
@@ -101,14 +100,11 @@ def run_script(folder_name, script_name):
     script_name = script_name.replace('.py', '')
 
   file_path = find_script(folder_name, full_name)
-  print(file_path)
   if file_path:
     script_hash = hash_content(file_path)
     output_name = '%s_%s_%s' % (folder_name, script_name, script_hash)
     output_path = os.path.join(config['html_output'], 'html', '%s.html' % output_name)
-    print(output_path)
     if os.path.exists(output_path):
-      print('tata')
       return output_path
   else:
     raise MissingScriptException('Script is missing from the repository configured %s/%s' % (folder_name, script_name))

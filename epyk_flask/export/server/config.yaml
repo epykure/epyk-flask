@@ -20,8 +20,6 @@ endpoints:
     -  D:\Experiments\epyk-flask2\epyk-flask\endpoints
   blueprints:
     epyk_basic_endpoints:
-      url_prefix:
-      name:        basics
-      import_name: epyk_basic_endpoints
-      attr_name: app
+      name:        basic
+
 
