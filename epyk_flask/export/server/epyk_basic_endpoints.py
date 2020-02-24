@@ -1,4 +1,4 @@
-import epyk_engine
+from epyk_flask import epyk_engine
 from flask import send_from_directory
 import traceback
 import os
@@ -10,14 +10,12 @@ flask_app = epyk_engine.engine_app.app
 @app.route("/index")
 def index():
   try:
-    print('toto')
     result = epyk_engine.run_script('root', 'index')
     dirname = os.path.dirname(result)
     filename = os.path.basename(result)
     return send_from_directory(dirname, '%s.html' % filename)
 
   except:
-    print(traceback.format_exc())
     return 'FAIL', 500
 
 @epyk_engine.config_required
