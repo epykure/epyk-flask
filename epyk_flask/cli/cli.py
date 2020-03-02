@@ -38,7 +38,7 @@ def create_new_parser(subparser):
   """"""
   subparser.set_defaults(func=new)
   subparser.add_argument('-p', '--path', required=True, help='''The path where the new environment will be created: -p /foo/bar''')
-  subparser.add_argument('-n', '--name', default='epyk-flask', help='''The name of the new environment: -n MyEnv''')
+  subparser.add_argument('-n', '--name', default='epyk-flask', help='''The name of the new project: -n MyEnv''')
   subparser.add_argument('--from', help='''Path or URL of the epyk-flask server to be copied from: --from /foo/bar/server1 or --from http://repo/env1/server1''')
 
 def create_env_parser(subparser):
@@ -57,6 +57,8 @@ def create_run_parser(subparser):
 def create_reset_parser(subparser):
   """"""
   subparser.set_defaults(func=reset)
+  subparser.add_argument('-p', '--path', required=True, help='''Path for the project project''')
+  subparser.add_argument('-n', '--name', default='epyk-flask', help='''The name of the new environment: -n MyEnv''')
   subparser.add_argument('-o', '--only', nargs='+', default=['all'], help='''Specified what you want to reset (templates, config, by default it will do both)''')
 
 def create_clear_parser(subparser):
@@ -95,7 +97,7 @@ def new(args):
     new_env_path = os.path.join(env_path, folder)
     os.makedirs(new_env_path)
     parse_struct(new_env_path, struct, 'server')
-  print('Environment created!')
+  print('Environment Created!')
 
 def env(args):
   """
@@ -119,7 +121,10 @@ def run(args):
   mod.app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=True)
 
 def reset(args):
-  pass
+  if args.only == 'all':
+    clear(args)
+    new(args)
+  #TODO Implement specific logic to reset parts of a project
 
 def clear(args):
   shutil.rmtree(args.path)
