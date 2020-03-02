@@ -1,3 +1,7 @@
+app:
+  path:  app
+  name: app
+
 repos:
 
   main_repo:
@@ -19,7 +23,7 @@ endpoints:
   path:
     -  endpoints
   blueprints:
-    epyk_basic_endpoints:
+    basic_endpoints:
       name:        basic
 
 
