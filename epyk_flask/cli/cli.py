@@ -6,7 +6,8 @@ import pkg_resources
 import shutil
 import os
 import project_structure
-
+import importlib
+from epyk_flask import sever_engine
 
 
 def main():
@@ -44,6 +45,8 @@ def create_run_parser(subparser):
   """"""
   subparser.set_defaults(func=run)
   subparser.add_argument('-p', '--path', required=True, help='''The path where the epyk-flask you want to run is: -p /foo/bar/myServer''')
+  subparser.add_argument('-c', '--config_path', help='''The path where config is located, the default will point to the config folder inside your project: -c /foo/bar/config.yaml''')
+  subparser.add_argument('-x', '--exclude', nargs='+', help='''Specify blueprints you want to exclude from the app: -x epyk_basic_endpoints, other_endpoints''')
 
 def create_reset_parser(subparser):
   """"""
@@ -87,11 +90,17 @@ def env(args):
   """
 
   """
+  pass
 
 def run(args):
   """
 
   """
+  if args.c:
+    config_path = args.c if args.c.endswith('.yaml') else '%s.config.yaml' % args.c
+  else:
+    config_path = os.path.join(args.p, 'config', 'config.yaml')
+  sever_engine.init(config_path)
 
 
 def reset(args):
