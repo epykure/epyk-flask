@@ -5,9 +5,14 @@ import argparse
 import pkg_resources
 import shutil
 import os
-import project_structure
 import importlib
-from epyk_flask import sever_engine
+from pprint import pprint
+from epyk_flask.cli import project_structure
+from epyk_flask import server_engine
+
+
+
+#TODO imlement install cli function to install new endpoints add ons
 
 
 def main():
@@ -15,7 +20,8 @@ def main():
   parser_map = {'new':           (create_new_parser,         '''Create new server structure'''),
                 'env':           (create_env_parser,         '''Create new environemnt'''),
                 'run':           (create_run_parser,         '''Deploy latest changes'''),
-                'reset':         (create_reset_parser,       '''Performs operation on local DB (Sqlite)'''),
+                'reset':         (create_reset_parser,       '''Resets parts of the environment'''),
+                'clear':         (create_clear_parser,       '''Clear whole project'''),
                 'version':       (create_version_parser,     '''Informs on current package version''')
                 }
   arg_parser = argparse.ArgumentParser(prog='epyk-flask')
@@ -53,23 +59,28 @@ def create_reset_parser(subparser):
   subparser.set_defaults(func=reset)
   subparser.add_argument('-o', '--only', nargs='+', default=['all'], help='''Specified what you want to reset (templates, config, by default it will do both)''')
 
+def create_clear_parser(subparser):
+  """"""
+  subparser.set_defaults(func=clear)
+  subparser.add_argument('-p', '--path', required=True, help='''Clears whole project''')
+
 def create_version_parser(subparser):
   """"""
   subparser.set_defaults(func=version)
 
-def parse_struct(env_path, struct):
+def parse_struct(env_path, struct, struct_type):
   """"""
   for sub_struct in struct:
     if type(sub_struct) == dict:
       for sub_folder, struct in sub_struct.items():
         new_env_path = os.path.join(env_path, sub_folder)
         os.makedirs(new_env_path)
-        parse_struct(new_env_path, struct)
+        parse_struct(new_env_path, struct, struct_type)
     else:
-      if sub_struct == '__init__.py' or sub_struct not in os.listdir(os.path.abspath(os.path.dirname(__file__))):
+      if sub_struct == '__init__.py' or sub_struct not in os.listdir(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'export', struct_type)):
         open(os.path.join(env_path, sub_struct), 'w').close()
       else:
-        shutil.copyfile(os.path.join(os.path.abspath(os.path.dirname(__file__)), sub_struct), env_path)
+        shutil.copy(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'export', struct_type, sub_struct), env_path)
 
 def new(args):
   """
@@ -83,7 +94,7 @@ def new(args):
   for folder, struct in project_structure.folder_struct.items():
     new_env_path = os.path.join(env_path, folder)
     os.makedirs(new_env_path)
-    parse_struct(new_env_path, struct)
+    parse_struct(new_env_path, struct, 'server')
   print('Environment created!')
 
 def env(args):
@@ -96,15 +107,23 @@ def run(args):
   """
 
   """
-  if args.c:
-    config_path = args.c if args.c.endswith('.yaml') else '%s.config.yaml' % args.c
+  if args.config_path:
+    config_path = args.config_path if args.c.endswith('.yaml') else '%s.config.yaml' % args.config_path
   else:
-    config_path = os.path.join(args.p, 'config', 'config.yaml')
-  sever_engine.init(config_path)
-
+    config_path = os.path.join(args.path, 'config', 'config.yaml')
+  engine = server_engine.Engine(config_path)
+  if engine.config['app'].get('path'):
+    sys.path.append(engine.config['app'].get('path'))
+  mod = importlib.import_module(engine.config['app']['name'])
+  mod.init_app(engine)
+  mod.app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=True)
 
 def reset(args):
   pass
+
+def clear(args):
+  shutil.rmtree(args.path)
+  print('Environment Cleared')
 
 def version(args):
   """
