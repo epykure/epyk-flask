@@ -5,12 +5,10 @@ app = Flask(__name__)
 
 
 def init_app(engine, excl_endpoints=None):
-  print(engine.config)
   for endpoint, properties in engine.config['endpoints']['blueprints'].items():
     if excl_endpoints and endpoint in excl_endpoints:
       continue
 
-    print(endpoint)
     path = '%s.%s' % (properties['path'], endpoint) if properties.get('path') else endpoint
     mod = importlib.import_module(path)
     app.register_blueprint(getattr(mod, engine.config['endpoints']['blueprints'][endpoint]['name']))
