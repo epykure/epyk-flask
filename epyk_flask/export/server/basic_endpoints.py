@@ -1,4 +1,4 @@
-from epyk_flask import sever_engine
+from epyk_flask import server_engine
 from flask import send_from_directory, Blueprint
 import os
 basic = Blueprint('basic', __name__)
@@ -7,7 +7,7 @@ basic = Blueprint('basic', __name__)
 @basic.route("/index")
 def index():
   try:
-    result = sever_engine.run_script('root', 'index')
+    result = server_engine.run_script('root', 'index')
     dirname = os.path.dirname(result)
     filename = os.path.basename(result)
     return send_from_directory(dirname, '%s.html' % filename)
@@ -19,7 +19,7 @@ def index():
 @basic.route("/run/<folder_name>/<script_name>", methods=['GET'])
 def run_report(folder_name, script_name):
   try:
-    result = sever_engine.run_script(folder_name, script_name)
+    result = server_engine.run_script(folder_name, script_name)
     dirname = os.path.dirname(result)
     filename = os.path.basename(result)
     return send_from_directory(dirname, filename)

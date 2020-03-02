@@ -1,5 +1,7 @@
 import yaml, hashlib, sys, os, importlib
 
+
+
 class MissingEpykFlaskConfigException(Exception):
   """Exception to be raised when the configuration is missing"""
   pass
@@ -49,10 +51,6 @@ class Engine(object):
         with open(config_path, 'r') as f:
           self.config = yaml.load(f, Loader=yaml.FullLoader)
 
-      for repo, repo_attr in self.config['repos'].items():
-        sys.path.append(repo_attr['path'])
-      for path in self.config['endpoints']['path']:
-        sys.path.append(path)
 
   def find_script(self, folder_name, script_name):
     file_path = os.path.join(self.config['default_repo']['path'], folder_name, script_name)

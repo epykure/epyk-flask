@@ -93,6 +93,7 @@ def new(args):
     raise argparse.ArgumentTypeError('An environment with this name already exists at this location: {}'.format(env_path))
 
   os.makedirs(env_path)
+  open(os.path.join(env_path, '__init__.py'), 'w').close()
   for folder, struct in project_structure.folder_struct.items():
     new_env_path = os.path.join(env_path, folder)
     os.makedirs(new_env_path)
@@ -109,6 +110,7 @@ def run(args):
   """
 
   """
+  sys.path.append(args.path)
   if args.config_path:
     config_path = args.config_path if args.c.endswith('.yaml') else '%s.config.yaml' % args.config_path
   else:
@@ -116,19 +118,20 @@ def run(args):
   engine = server_engine.Engine(config_path)
   if engine.config['app'].get('path'):
     sys.path.append(engine.config['app'].get('path'))
+  pprint(sys.path)
   mod = importlib.import_module(engine.config['app']['name'])
   mod.init_app(engine)
   mod.app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=True)
 
 def reset(args):
-  if args.only == 'all':
+  if 'all' in args.only:
     clear(args)
     new(args)
   #TODO Implement specific logic to reset parts of a project
 
 def clear(args):
   shutil.rmtree(args.path)
-  print('Environment Cleared')
+  print('Environment Cleared!')
 
 def version(args):
   """

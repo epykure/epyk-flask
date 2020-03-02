@@ -1,16 +1,18 @@
-from flask import Flask, Blueprint
+from flask import Flask
 import importlib
-from epyk_flask import sever_engine
+from epyk_flask import server_engine
 app = Flask(__name__)
 
 
-
-def init_flask_app(engine, excl_endpoints=None):
-  for endpoint in engine.config['endpoints']['blueprints']:
+def init_app(engine, excl_endpoints=None):
+  print(engine.config)
+  for endpoint, properties in engine.config['endpoints']['blueprints'].items():
     if excl_endpoints and endpoint in excl_endpoints:
       continue
 
-    mod = importlib.import_module(endpoint)
+    print(endpoint)
+    path = '%s.%s' % (properties['path'], endpoint) if properties.get('path') else endpoint
+    mod = importlib.import_module(path)
     app.register_blueprint(getattr(mod, engine.config['endpoints']['blueprints'][endpoint]['name']))
 
 def __init_test(engine):
@@ -19,6 +21,6 @@ def __init_test(engine):
 
 
 if __name__ == '__main__':
-  engine = sever_engine.Engine()
+  engine = server_engine.Engine()
   __init_test(engine)
   app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=True)

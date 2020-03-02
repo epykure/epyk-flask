@@ -1,6 +1,5 @@
 app:
-  path:  app
-  name: app
+  name: server_app.app
 
 repos:
 
@@ -20,10 +19,11 @@ host:
 server_interface:  epyk_app
 
 endpoints:
-  path:
-    -  endpoints
+  paths:
+    -
   blueprints:
     basic_endpoints:
+      path:        endpoints
       name:        basic
 
 
