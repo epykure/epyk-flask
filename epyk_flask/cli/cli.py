@@ -6,7 +6,6 @@ import pkg_resources
 import shutil
 import os
 import importlib
-from pprint import pprint
 from epyk_flask.cli import project_structure
 from epyk_flask import server_engine
 
@@ -118,7 +117,6 @@ def run(args):
   engine = server_engine.Engine(config_path)
   if engine.config['app'].get('path'):
     sys.path.append(engine.config['app'].get('path'))
-  pprint(sys.path)
   mod = importlib.import_module(engine.config['app']['name'])
   mod.init_app(engine)
   mod.app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=True)
