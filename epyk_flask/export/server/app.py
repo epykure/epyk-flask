@@ -1,6 +1,7 @@
 from flask import Flask
 import importlib
 from epyk_flask import server_engine
+
 app = Flask(__name__)
 
 
@@ -21,4 +22,4 @@ def __init_test(engine):
 if __name__ == '__main__':
   engine = server_engine.Engine()
   __init_test(engine)
-  app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=True)
+  app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=True, debug=True)
