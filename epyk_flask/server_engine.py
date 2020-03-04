@@ -87,7 +87,8 @@ class Engine(object):
     mod = importlib.import_module('%s.%s' % (folder_name, script_name))
     rptObj = getattr(mod, 'REPORT_OBJECT', False)
     if not rptObj:
-      MissingRptObjException('Your report: %s is missing the REPORT_OBJECT attribute which should be an Report Object from %s' % (mod.__name__, Report.__module__))
+      raise MissingRptObjException('Your report: %s is missing the REPORT_OBJECT attribute which should be an Report Object from Epyk-UI' % mod.__name__)
+
     if hasattr(mod, 'FAVICON'):
       rptObj.logo = mod.FAVICON
     if getattr(mod, 'CONTROLLED_ACCESS', False):

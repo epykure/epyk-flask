@@ -51,12 +51,11 @@ def create_env_parser(subparser):
 def create_run_parser(subparser):
   """"""
   subparser.set_defaults(func=run)
-  subparser.add_argument('-p', '--path', required=True,
-                         help='''The path where the epyk-flask you want to run is: -p /foo/bar/myServer''')
-  subparser.add_argument('-c', '--config_path',
-                         help='''The path where config is located, the default will point to the config folder inside your project: -c /foo/bar/config.yaml''')
-  subparser.add_argument('-x', '--exclude', nargs='+',
-                         help='''Specify blueprints you want to exclude from the app: -x epyk_basic_endpoints, other_endpoints''')
+  subparser.add_argument('-p', '--path', required=True, help='''The path where the epyk-flask you want to run is: -p /foo/bar/myServer''')
+  subparser.add_argument('-d', '--debug', action='store_true', help='''Specify whether we want to start the app in debug mode''')
+  subparser.add_argument('-t', '--threaded', action='store_true', help='''Specify whether we want to start the app in threaded mode''')
+  subparser.add_argument('-c', '--config_path', help='''The path where config is located, the default will point to the config folder inside your project: -c /foo/bar/config.yaml''')
+  subparser.add_argument('-x', '--exclude', nargs='+', help='''Specify blueprints you want to exclude from the app: -x epyk_basic_endpoints, other_endpoints''')
 
 
 def create_reset_parser(subparser):
@@ -89,7 +88,7 @@ def parse_struct(env_path, struct, struct_type):
         parse_struct(new_env_path, struct, struct_type)
     else:
       if sub_struct == '__init__.py' or sub_struct not in os.listdir(
-          os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'export', struct_type)):
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'export', struct_type)):
         open(os.path.join(env_path, sub_struct), 'w').close()
       else:
         shutil.copy(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..', 'export', struct_type, sub_struct),
@@ -135,7 +134,7 @@ def run(args):
     sys.path.append(engine.config['app'].get('path'))
   mod = importlib.import_module(engine.config['app']['name'])
   mod.init_app(engine)
-  mod.app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=True)
+  mod.app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=args.threaded, debug=args.debug)
 
 
 def reset(args):
