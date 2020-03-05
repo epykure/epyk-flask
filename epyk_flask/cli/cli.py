@@ -134,7 +134,17 @@ def run(args):
     sys.path.append(engine.config['app'].get('path'))
   mod = importlib.import_module(engine.config['app']['name'])
   mod.init_app(engine)
-  mod.app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=args.threaded, debug=args.debug)
+  if engine.config['app'].get('websocket', False):
+    try:
+      from geventwebsocket.handler import WebSocketHandler
+      from gevent.pywsgi import WSGIServer
+    except (ImportError, ModuleNotFoundError) as e:
+      print('You need to have gevent-websocket installed to use websockets in your app: pip install gevent-websocket')
+      raise
+
+    WSGIServer((engine.config['host']['ip'], engine.config['host']['port']), mod.app, handler_class=WebSocketHandler)
+  else:
+    mod.app.run(host=engine.config['host']['ip'], port=engine.config['host']['port'], threaded=args.threaded, debug=args.debug)
 
 
 def reset(args):

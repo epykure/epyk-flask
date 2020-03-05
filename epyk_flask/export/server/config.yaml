@@ -1,5 +1,25 @@
+############# APP SECTION #############
 app:
   name: server_app.app
+  websocket: False
+
+############################################################################################
+# Comment out app section above if you want to use web sockets and uncomment below seciont #
+#app:
+#  name: server_app.app_gevent
+#  websocket: True
+
+############# ENDPOINTS SECTION #############
+
+endpoints:
+  paths:
+    -
+  blueprints:
+    basic_endpoints:
+      path:        endpoints
+      name:        basic
+
+############# REPOSITORIES SECTION #############
 
 repos:
 
@@ -10,6 +30,8 @@ repos:
 
 default_repo:  *main_repo
 
+############# SERVER CONFIG SECTION #############
+
 html_output:   UI
 
 host:
@@ -17,13 +39,4 @@ host:
   port:         5000
 
 server_interface:  epyk_app
-
-endpoints:
-  paths:
-    -
-  blueprints:
-    basic_endpoints:
-      path:        endpoints
-      name:        basic
-
 

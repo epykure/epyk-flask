@@ -1,7 +1,5 @@
 import yaml, hashlib, sys, os, importlib
 
-
-
 class MissingEpykFlaskConfigException(Exception):
   """Exception to be raised when the configuration is missing"""
   pass
