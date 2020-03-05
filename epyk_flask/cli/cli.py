@@ -6,6 +6,7 @@ import pkg_resources
 import shutil
 import os
 import importlib
+import subprocess
 from epyk_flask.cli import project_structure
 from epyk_flask import server_engine
 
@@ -53,6 +54,7 @@ def create_run_parser(subparser):
   subparser.set_defaults(func=run)
   subparser.add_argument('-p', '--path', required=True, help='''The path where the epyk-flask you want to run is: -p /foo/bar/myServer''')
   subparser.add_argument('-d', '--debug', action='store_true', help='''Specify whether we want to start the app in debug mode''')
+  subparser.add_argument('--ws', action='store_true', help='''Specify whether we want to use websocket features (overrides whatever is in the config)''')
   subparser.add_argument('-t', '--threaded', action='store_true', help='''Specify whether we want to start the app in threaded mode''')
   subparser.add_argument('-c', '--config_path', help='''The path where config is located, the default will point to the config folder inside your project: -c /foo/bar/config.yaml''')
   subparser.add_argument('-x', '--exclude', nargs='+', help='''Specify blueprints you want to exclude from the app: -x epyk_basic_endpoints, other_endpoints''')
@@ -134,13 +136,19 @@ def run(args):
     sys.path.append(engine.config['app'].get('path'))
   mod = importlib.import_module(engine.config['app']['name'])
   mod.init_app(engine)
-  if engine.config['app'].get('websocket', False):
+  if engine.config['app'].get('websocket', False) or args.ws:
     try:
       from geventwebsocket.handler import WebSocketHandler
       from gevent.pywsgi import WSGIServer
-    except (ImportError, ModuleNotFoundError) as e:
+    except (ImportError, ModuleNotFoundError):
       print('You need to have gevent-websocket installed to use websockets in your app: pip install gevent-websocket')
-      raise
+      install = input('Do you want to install it now ? (Y/N): ')
+      if install == 'Y':
+        subprocess.check_call(sys.executable, '-m', 'pip', 'install', 'gevent-websocket')
+        from geventwebsocket.handler import WebSocketHandler
+        from gevent.pywsgi import WSGIServer
+      else:
+        raise
 
     WSGIServer((engine.config['host']['ip'], engine.config['host']['port']), mod.app, handler_class=WebSocketHandler)
   else:

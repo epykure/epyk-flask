@@ -3,12 +3,6 @@ app:
   name: server_app.app
   websocket: False
 
-############################################################################################
-# Comment out app section above if you want to use web sockets and uncomment below seciont #
-#app:
-#  name: server_app.app_gevent
-#  websocket: True
-
 ############# ENDPOINTS SECTION #############
 
 endpoints:
