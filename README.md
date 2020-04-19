@@ -1,5 +1,5 @@
 
-![](https://raw.githubusercontent.com/epykure/epyk-flask/master/epyk_flask/static/images/epyk-flask.PNG)
+![](https://raw.githubusercontent.com/epykure/epyk-flask/master/epyk_flask/static/images/epyk-flask_mini.PNG)
 
 ### First Version out now!
 
