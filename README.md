@@ -10,6 +10,30 @@ Installation:
 
 pip install epyk_flask
 
+
+Get Started:
+==============
+
+epyk-flask new -p server_path
+
+This will create a new server structure at the path of your choice
+
+epyk-flask env -p server_path/epyk_flask/UI/scripts
+
+This will create a new environments where you want to store scripts that will use Epyk
+
+
+Configuration:
+=================
+
+The configuration for your server is located under:
+
+server_path/epyk_flask/config
+
+Please be aware the epyk_flask is the name of your project by default but it can be different if you chose to create it with a different name
+
+
+
 Documentation:
 ==================
 
