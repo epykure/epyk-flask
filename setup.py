@@ -16,7 +16,7 @@ def install_required():
 setuptools.setup(
     name="epyk-flask",
     author="epykure",
-    version="1.0.1",
+    version="1.0.2",
     author_email="epykure@gmail.com",
     description="",
     long_description=long_description,

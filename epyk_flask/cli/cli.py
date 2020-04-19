@@ -16,7 +16,7 @@ def main():
   """"""
   parser_map = {'new': (create_new_parser, '''Create new server structure'''),
                 'env': (create_env_parser, '''Create new environemnt'''),
-                'run': (create_run_parser, '''Deploy latest changes'''),
+                'run': (create_run_parser, '''Runs the server'''),
                 'reset': (create_reset_parser, '''Resets parts of the environment'''),
                 'clear': (create_clear_parser, '''Clear whole project'''),
                 'version': (create_version_parser, '''Informs on current package version''')
